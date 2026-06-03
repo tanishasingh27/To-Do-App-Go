@@ -12,6 +12,18 @@ type Task struct {
 	Completed bool
 }
 
+func createTask(title string) Task {
+	return Task{
+		Title:     title,
+		Completed: false,
+	}
+}
+
+func markTaskComplete(tasks []Task, index int) []Task {
+	tasks[index].Completed = true
+	return tasks
+}
+
 func addTask(tasks []Task) []Task {
 	reader := bufio.NewReader(os.Stdin)
 	fmt.Println("Enter Task : ")
@@ -21,10 +33,7 @@ func addTask(tasks []Task) []Task {
 		return tasks
 	}
 	title = strings.TrimSpace(title)
-	newTask := Task{
-		Title:     title,
-		Completed: false,
-	}
+	newTask := createTask(title)
 
 	tasks = append(tasks, newTask)
 
@@ -93,7 +102,7 @@ func completeTask(tasks []Task) []Task {
 
 	index := taskNoC - 1
 
-	tasks[index].Completed = true
+	tasks = markTaskComplete(tasks, index)
 
 	fmt.Println("Task marked as completed")
 	return tasks
