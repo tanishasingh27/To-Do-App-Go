@@ -3,9 +3,17 @@ package main
 import (
 	"bufio"
 	"fmt"
-	"os"
+	"strconv"
 	"strings"
 )
+
+func readInt(reader *bufio.Reader) (int, error) {
+	line, err := reader.ReadString('\n')
+	if err != nil {
+		return 0, err
+	}
+	return strconv.Atoi(strings.TrimSpace(line))
+}
 
 type Task struct {
 	Title     string
@@ -24,8 +32,7 @@ func markTaskComplete(tasks []Task, index int) []Task {
 	return tasks
 }
 
-func addTask(tasks []Task) []Task {
-	reader := bufio.NewReader(os.Stdin)
+func addTask(reader *bufio.Reader, tasks []Task) []Task {
 	fmt.Println("Enter Task : ")
 	title, err := reader.ReadString('\n')
 	if err != nil {
@@ -33,6 +40,10 @@ func addTask(tasks []Task) []Task {
 		return tasks
 	}
 	title = strings.TrimSpace(title)
+	if title == "" {
+		fmt.Println("Task title cannot be empty")
+		return tasks
+	}
 	newTask := createTask(title)
 
 	tasks = append(tasks, newTask)
@@ -58,9 +69,7 @@ func viewTasks(tasks []Task) {
 	}
 }
 
-func deleteTask(tasks []Task) []Task {
-	var deleteNo int
-
+func deleteTask(reader *bufio.Reader, tasks []Task) []Task {
 	viewTasks(tasks)
 
 	if len(tasks) == 0 {
@@ -69,7 +78,11 @@ func deleteTask(tasks []Task) []Task {
 	}
 
 	fmt.Printf("Enter task number : ")
-	fmt.Scan(&deleteNo)
+	deleteNo, err := readInt(reader)
+	if err != nil {
+		fmt.Println("Invalid task number")
+		return tasks
+	}
 
 	index := deleteNo - 1
 
@@ -82,7 +95,7 @@ func deleteTask(tasks []Task) []Task {
 	return tasks
 }
 
-func completeTask(tasks []Task) []Task {
+func completeTask(reader *bufio.Reader, tasks []Task) []Task {
 	if len(tasks) == 0 {
 		fmt.Println("No task available")
 		return tasks
@@ -90,10 +103,12 @@ func completeTask(tasks []Task) []Task {
 
 	viewTasks(tasks)
 
-	var taskNoC int
-
 	fmt.Println("Enter task number to complete : ")
-	fmt.Scan(&taskNoC)
+	taskNoC, err := readInt(reader)
+	if err != nil {
+		fmt.Println("Invalid task number")
+		return tasks
+	}
 
 	if taskNoC <= 0 || taskNoC > len(tasks) {
 		fmt.Println("Invalid task number")
